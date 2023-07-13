@@ -97,6 +97,7 @@ export default {
       deep: true,
       handler(val) {
         this.form = val
+        this.$emit('change',val)
       }
     },
   },
