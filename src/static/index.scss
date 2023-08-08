@@ -8,6 +8,7 @@
 	background-color: #fff;
 	overflow: hidden;
 
+
 	&.is-border {
 		border: 1px solid #eee;
 	}
@@ -240,6 +241,9 @@
 	padding: 5px;
 	overflow: hidden;
 	transition: all 0.3s;
+	.width100 {
+		width: 100%;
+	}
 
 	.cl-collapse {
 		font-size: 12px;
