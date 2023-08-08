@@ -416,7 +416,7 @@ export default {
 							// }
 
 							// 如果有customCheck属性,就覆盖validator属性,并抛出当前对象.
-							if (e.rules?.customCheck) {
+							if (e.rules?.customCheck && e.hidden !== true) {
 								const func = e.rules?.customCheck;
 								e.rules.validator = (rule, value, callback) => {
 									const callbackTxt = func(value, this.form, e);
