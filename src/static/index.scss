@@ -46,6 +46,10 @@
 		}
 	}
 }
+.cl-dialog__container{
+	overflow: auto;
+	max-height: 85vh;
+}
 
 .cl-flex1 {
 	flex: 1;
