@@ -525,6 +525,17 @@ export default {
 													{/* Component */}
 													{["prepend", "component", "append"].map(
 														(name) => {
+															/* // 如果是component才会执行编辑模式的判断,prepend和append都直接渲染原始数据 */
+															let renderNodeTag = e[name];
+															if (name === "component") {
+																if (currentEdit) {
+																	renderNodeTag = e[name];
+																} else {
+																	renderNodeTag = vNode;
+																}
+															} else {
+																renderNodeTag = e[name];
+															}
 															return (
 																e[name] && (
 																	<div
@@ -542,39 +553,26 @@ export default {
 																					: e.flex
 																			}
 																		]}>
-                                      {/* // 如果是component才会执行编辑模式的判断,prepend和append都直接渲染原始数据 */}
-																		{renderNode(
-																			name === "component"
-																				? currentEdit
-																					? e[name]
-																					: vNode
-																				: e[name],
-																			{
-																				ref: e.prop,
-																				prop: e.prop,
-																				on: {
-																					change: (
-																						val
-																					) => {
-																						// 如果组件有chang事件,就执行
-																						e.component
-																							.change &&
-																							e.component.change(
-																								val,
-																								this
-																									.form
-																							);
-																						this.change(
-																							e
+																		{renderNode(renderNodeTag, {
+																			ref: e.prop,
+																			prop: e.prop,
+																			on: {
+																				change: (val) => {
+																					// 如果组件有chang事件,就执行
+																					e.component
+																						.change &&
+																						e.component.change(
+																							val,
+																							this
+																								.form
 																						);
-																					}
-																				},
-																				scope: this.form,
-																				$scopedSlots:
-																					this
-																						.$scopedSlots
-																			}
-																		)}
+																					this.change(e);
+																				}
+																			},
+																			scope: this.form,
+																			$scopedSlots:
+																				this.$scopedSlots
+																		})}
 																	</div>
 																)
 															);
