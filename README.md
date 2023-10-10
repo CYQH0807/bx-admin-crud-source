@@ -49,3 +49,6 @@
 -   1.0.7 解决 $crud.emit 失效问题
 -   1.0.6 cl-form 添加 provide.form
 -   1.0.0 初始化
+
+
+-- longyuan ==  龙源版本最后一次封板
