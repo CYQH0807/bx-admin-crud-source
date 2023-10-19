@@ -8,7 +8,6 @@
 	background-color: #fff;
 	overflow: hidden;
 
-
 	&.is-border {
 		border: 1px solid #eee;
 	}
@@ -46,7 +45,7 @@
 		}
 	}
 }
-.cl-dialog__container{
+.cl-dialog__container {
 	overflow: auto;
 	max-height: 85vh;
 }
@@ -245,6 +244,11 @@
 	padding: 5px;
 	overflow: hidden;
 	transition: all 0.3s;
+
+	.active{
+		border: 1px solid red;
+	}
+
 	.width100 {
 		width: 100%;
 	}
@@ -271,7 +275,7 @@
 	}
 	.el-form-item--small.el-form-item {
 		margin-bottom: 5px;
-		padding-bottom: 10px;
+		padding-bottom: 5px;
 		display: flex;
 	}
 
@@ -644,4 +648,19 @@
 			}
 		}
 	}
+}
+
+.bxCrud {
+	margin-bottom: 15px;
+	padding-top: 12px;
+	padding-bottom: 7px;
+	border-radius: 4px;
+}
+
+.crud-inner {
+	background: #fff;
+}
+
+.crud-border {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }

@@ -59,6 +59,7 @@ export default {
 					size: "small",
 					"label-width": "100px"
 				},
+				lowCode: false, // 低代码模式
 				isEdit: true,
 				span: 24,
 				on: {
@@ -122,6 +123,9 @@ export default {
 							// 如果没有loading就添加
 							if (item.loading === undefined) {
 								item.loading = false;
+							}
+							if (item.active === undefined) {
+								item.active = false;
 							}
 							return item;
 						});
@@ -221,6 +225,24 @@ export default {
 			} else {
 				return __inst.$refs;
 			}
+		},
+
+		/**
+		 * @description: 每个col点击之后的事件
+		 * @param {*} item
+		 * @return {*}
+		 * @author: 池樱千幻
+		 */
+		colHandleClick(item) {
+			console.log("item: ", item);
+			// 将所有的表单都设置为不激活
+			this.conf.items.forEach((e) => {
+				e.active = false;
+			});
+			// 将当前的表单设置为激活
+			item.active = true;
+
+			this.$emit("activeChange", item);
 		},
 
 		open(options) {
@@ -341,7 +363,7 @@ export default {
 
 		// 渲染表单
 		renderForm() {
-			const { props, items, _data, span, isEdit } = this.conf;
+			const { props, items, _data, span, isEdit, lowCode } = this.conf;
 
 			return (
 				<el-form
@@ -414,6 +436,12 @@ export default {
 							//     })
 							//   }
 							// }
+							console.log(
+								"this.$scopedSlots-------",
+								this,
+								this.$slots,
+								this.$scopedSlots
+							);
 
 							// 如果有customCheck属性,就覆盖validator属性,并抛出当前对象.
 							if (e.rules?.customCheck && e.hidden !== true) {
@@ -484,12 +512,22 @@ export default {
 							return (
 								!e._hidden && (
 									<el-col
-										key={`form-item-${i}`}
+										key={`form-item-${e.prop}`}
+										class={[
+											{
+												active: e.active
+											}
+										]}
 										{...{
 											props: {
 												key: i,
 												span: span,
 												...e
+											},
+											nativeOn: {
+												click: () => {
+													lowCode && this.colHandleClick(e);
+												}
 											}
 										}}>
 										{e.component && (
@@ -671,7 +709,8 @@ export default {
 						} else {
 							return renderNode(vnode, {
 								scope: this.form,
-								$scopedSlots: this.$scopedSlots
+								$scopedSlots: this.$scopedSlots,
+								$slots:this.$slots
 							});
 						}
 				  });

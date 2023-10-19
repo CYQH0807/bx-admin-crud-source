@@ -17,7 +17,7 @@ import Dialog from './dialog'
 import Filter from './filter'
 import FilterGroup from './filter-group'
 import ErrorMessage from './error-message'
-
+import AdminCrud from './admin-crud'
 export {
   Crud,
   AddBtn,
@@ -37,5 +37,6 @@ export {
   Dialog,
   Filter,
   FilterGroup,
-  ErrorMessage
+  ErrorMessage,
+  AdminCrud
 }

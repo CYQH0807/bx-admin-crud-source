@@ -8,7 +8,7 @@ const webpackConfig = {
   mode: 'production',
   entry: './src/index.js',
   output: {
-    path: resolve('../ceas-web/bx-admin-crud'),
+    path: resolve('../base-e-commerce-platform/bx-admin-crud'),
     filename: 'bx-admin-crud.min.js',
     libraryTarget: 'umd'
   },
