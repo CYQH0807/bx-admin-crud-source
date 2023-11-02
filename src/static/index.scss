@@ -245,7 +245,7 @@
 	overflow: hidden;
 	transition: all 0.3s;
 
-	.active{
+	.active {
 		border: 1px solid red;
 	}
 
@@ -282,6 +282,7 @@
 	.el-form-item {
 		.el-form-item__error {
 			position: absolute;
+			top: auto;
 		}
 
 		.el-slider {

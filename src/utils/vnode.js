@@ -8,15 +8,13 @@ import { __inst, __vue } from "@/store";
  */
 // eslint-disable-next-line camelcase
 const parse_jsx = (vnode, options = {}) => {
-	console.log("vnode: ", vnode, options);
 	const { scope, prop, $scopedSlots, children = [], on, ref } = options;
 	const h = __inst.$createElement;
 
 	if (vnode.name.indexOf("slot-") === 0) {
 		const rn = $scopedSlots[vnode.name];
-
 		if (rn) {
-			return rn({ scope,abc:123,bbb:3435 });
+			return rn({ item: scope[prop], scope, ...on });
 		} else {
 			return <cl-error-message title={`组件渲染失败，未找到插槽：${vnode.name}`} />;
 		}

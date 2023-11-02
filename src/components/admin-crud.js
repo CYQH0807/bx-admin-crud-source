@@ -63,6 +63,11 @@ export default {
 				return {};
 			}
 		},
+		// 是否编辑模式
+		editFlag: {
+			type: Boolean,
+			default: true
+		},
 		value: {
 			type: Object,
 			default: () => {
@@ -88,7 +93,7 @@ export default {
 					"label-position": "right",
 					inline: true
 				},
-				isEdit: true,
+				isEdit: this.editFlag,
 				span: this.colSpan,
 				op: {
 					hidden: this.btnHidden,
@@ -122,9 +127,7 @@ export default {
 	watch: {
 		options: {
 			handler(val) {
-				console.log("val: ", val);
 				this.$Form.create(this._formOptions);
-				console.log("this._formOptions: ", this._formOptions);
 				this.setData(this.value);
 			},
 			deep: true
@@ -326,22 +329,9 @@ export default {
 	},
 
 	render(createElement) {
-		// const scopedList = Object.keys(this.$scopedSlots).map((key) => {
-		// 	console.log("key: ", key);
-		// 	return createElement("template", { slot: key }, [
-		// 		createElement("slot", {
-		// 			name: key,
-		// 			scopedSlots: {
-		// 				default: (slotProps) => {
-		// 					return this.$scopedSlots[key](slotProps);
-		// 				}
-		// 			}
-		// 		})
-		// 	]);
-		// });
-
-		const scopedList = Object.keys(this.$scopedSlots).map((key) => {
-			return createElement('template', { slot: key }, this.$scopedSlots[key](this.value));
+		let scopedSlots = {};
+		Object.keys(this.$scopedSlots).forEach((key) => {
+			scopedSlots[key] = (props) => this.$scopedSlots[key](props || {});
 		});
 
 		return (
@@ -359,9 +349,8 @@ export default {
 				}}
 				onchange={(val) => {
 					this.change(val);
-				}}>
-				{scopedList}
-			</cl-form>
+				}}
+				scopedSlots={scopedSlots}></cl-form>
 		);
 	}
 };

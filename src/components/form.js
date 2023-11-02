@@ -234,7 +234,6 @@ export default {
 		 * @author: 池樱千幻
 		 */
 		colHandleClick(item) {
-			console.log("item: ", item);
 			// 将所有的表单都设置为不激活
 			this.conf.items.forEach((e) => {
 				e.active = false;
@@ -436,13 +435,7 @@ export default {
 							//     })
 							//   }
 							// }
-							console.log(
-								"this.$scopedSlots-------",
-								this,
-								this.$slots,
-								this.$scopedSlots
-							);
-
+							
 							// 如果有customCheck属性,就覆盖validator属性,并抛出当前对象.
 							if (e.rules?.customCheck && e.hidden !== true) {
 								const func = e.rules?.customCheck;
@@ -602,7 +595,12 @@ export default {
 																						e.component.change(
 																							val,
 																							this
-																								.form
+																								.form,
+																							this
+																								.form[
+																								e
+																									.prop
+																							]
 																						);
 																					this.change(e);
 																				}
@@ -710,7 +708,7 @@ export default {
 							return renderNode(vnode, {
 								scope: this.form,
 								$scopedSlots: this.$scopedSlots,
-								$slots:this.$slots
+								$slots: this.$slots
 							});
 						}
 				  });
