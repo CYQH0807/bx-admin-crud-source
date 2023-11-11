@@ -244,9 +244,12 @@
 	padding: 5px;
 	overflow: hidden;
 	transition: all 0.3s;
+	position: relative;
 
-	.active {
-		border: 1px solid red;
+	.cl-form__container {
+		.active {
+			border: 1px solid red;
+		}
 	}
 
 	.width100 {
@@ -254,12 +257,12 @@
 	}
 
 	.cl-collapse {
-		font-size: 12px;
+		font-size: 14px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		height: 35px;
-		margin-left: 8px;
+		margin-right: 8px;
 		color: #257df8;
 		cursor: pointer;
 		position: relative;
@@ -274,8 +277,7 @@
 		}
 	}
 	.el-form-item--small.el-form-item {
-		margin-bottom: 5px;
-		padding-bottom: 5px;
+		margin-bottom: 10px;
 		display: flex;
 	}
 
@@ -652,10 +654,24 @@
 }
 
 .bxCrud {
-	margin-bottom: 15px;
-	padding-top: 12px;
-	padding-bottom: 7px;
 	border-radius: 4px;
+
+	.collapseShow {
+		display: none;
+	}
+}
+.cl-form-btn {
+	height: 50px;
+	display: flex;
+	width: 100%;
+	justify-content: end;
+	align-items: start;
+}
+
+.cl-form-btn-core {
+	position: absolute;
+	right: 5px;
+	bottom: 5px;
 }
 
 .crud-inner {
@@ -664,4 +680,12 @@
 
 .crud-border {
 	border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.formFade-enter-active,
+.formFade-leave-active {
+	transition: opacity 0.2s;
+}
+.formFade-enter, .formFade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+	opacity: 0;
 }

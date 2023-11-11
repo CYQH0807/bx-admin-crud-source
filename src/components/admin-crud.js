@@ -1,5 +1,5 @@
 import XEUtils from "xe-utils";
-
+import { __AdminCrud } from "@/store";
 export default {
 	name: "cl-admin-crud",
 	componentName: "ClAdminCrud",
@@ -15,22 +15,30 @@ export default {
 		// 是否显示重置按钮
 		isResetBtn: {
 			type: Boolean,
-			default: false
+			default: () => {
+				return __AdminCrud?.isResetBtn || false;
+			}
 		},
 		// 无边框
 		noBorder: {
 			type: Boolean,
-			default: true
+			default: () => {
+				return __AdminCrud?.noBorder || false;
+			}
 		},
 		// 是否显示折叠按钮
 		showCollapse: {
 			type: Boolean,
-			default: true
+			default: () => {
+				return __AdminCrud?.op?.collapse || true;
+			}
 		},
 		// 是否默认折叠
 		collapseFlag: {
 			type: Boolean,
-			default: true
+			default: () => {
+				return __AdminCrud?.op?.collapseFlag || true;
+			}
 		},
 		// 是否内联表单, 默认内联
 		inner: {
@@ -45,17 +53,23 @@ export default {
 		// 按钮位置
 		buttonsLocation: {
 			type: String,
-			default: "right"
+			default: () => {
+				return __AdminCrud?.op?.buttonsLocation || "right";
+			}
 		},
 		// 默认一行三列
 		colSpan: {
 			type: Number,
-			default: 8
+			default: () => {
+				return __AdminCrud?.colSpan || 8;
+			}
 		},
 		// label宽度
 		labelWidth: {
 			type: String,
-			default: "120px"
+			default: () => {
+				return __AdminCrud?.props?.labelWidth || "120px";
+			}
 		},
 		formOptions: {
 			type: Object,
@@ -67,6 +81,17 @@ export default {
 		editFlag: {
 			type: Boolean,
 			default: true
+		},
+		lowCode:{
+			type: Boolean,
+			default: false
+		},
+		// 折叠数量判断, 当前总span大于这个数量, 才开始折叠
+		collapseMaxSpan: {
+			type: Number,
+			default: () => {
+				return __AdminCrud?.op?.collapseMaxSpan || 48;
+			}
 		},
 		value: {
 			type: Object,
@@ -84,7 +109,7 @@ export default {
 
 	computed: {
 		_formOptions() {
-			const defaultOptions = {
+			let defaultOptions = {
 				title: "自定义测试表单",
 				width: "80%",
 				props: {
@@ -95,11 +120,13 @@ export default {
 				},
 				isEdit: this.editFlag,
 				span: this.colSpan,
+				lowCode: this.lowCode, // 低代码模式
 				op: {
 					hidden: this.btnHidden,
 					closeButtonText: "重置",
 					collapse: this.showCollapse,
 					collapseFlag: this.collapseFlag,
+					collapseMaxSpan: this.collapseMaxSpan,
 					saveButtonText: "查询",
 					buttons: ["select", this.isResetBtn ? "close" : undefined],
 					buttonsLocation: this.buttonsLocation
@@ -127,6 +154,7 @@ export default {
 	watch: {
 		options: {
 			handler(val) {
+				console.log('val: ', val);
 				this.$Form.create(this._formOptions);
 				this.setData(this.value);
 			},
@@ -149,6 +177,18 @@ export default {
 	methods: {
 		dialogClose() {
 			this.$Form.close();
+		},
+
+
+
+  /**
+   * @description:  根据prop获取表单的option
+   * @param {*} prop
+   * @return {*}
+   * @author: 池樱千幻
+   */
+		getOptionByProp(prop) {
+			return this.$Form.getOptionByProp(prop);
 		},
 
 		/**
@@ -313,7 +353,7 @@ export default {
 		},
 		change(val) {
 			this.$emit("change", val);
-			this.$emit("input", Object.assign({}, this.value, val));
+			this.$emit("input", val);
 		},
 		validate() {
 			return new Promise((resolve, reject) => {

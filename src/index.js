@@ -1,71 +1,73 @@
 /* eslint-disable no-import-assign */
-import * as components from './components'
-import * as store from './store'
-import { getInstance } from './utils'
+import * as components from "./components";
+import * as store from "./store";
+import { getInstance } from "./utils";
 
-require('./common')
+require("./common");
 
-let Form = null
-let ContextMenu = null
+let Form = null;
+let ContextMenu = null;
 
-const install = function(Vue, options = {}) {
-  const { crud = {}, alias = 'cl-crud' } = options
+const install = function (Vue, options = {}) {
+	console.log("options: ", options);
+	const { crud = {}, alias = "cl-crud", AdminCrud = {} } = options;
 
-  // 样式
-  if (!crud.style) crud.style = {}
+	// 样式
+	if (!crud.style) crud.style = {};
 
-  // 表格
-  if (!crud.table) crud.table = {}
+	// 表格
+	if (!crud.table) crud.table = {};
 
-  // 缓存配置
-  store.__crud = crud
-  store.__vue = Vue
-  store.__inst = new Vue()
+	// 缓存配置
+	store.__crud = crud;
+	store.__AdminCrud = AdminCrud;
+	store.__vue = Vue;
+	store.__inst = new Vue();
 
-  // 注册组件
-  for (const i in components) {
-    Vue.component(i === 'Crud' ? alias : components[i].name, components[i])
-  }
+	// 注册组件
+	for (const i in components) {
+		Vue.component(i === "Crud" ? alias : components[i].name, components[i]);
+	}
 
-  // 获取组件实例
-  Form = getInstance(components.Form)
-  ContextMenu = getInstance(components.ContextMenu);
+	// 获取组件实例
+	Form = getInstance(components.Form);
+	ContextMenu = getInstance(components.ContextMenu);
 
-  // 注册右键菜单指令
-  (function() {
-    function fn(el, binding) {
-      el.oncontextmenu = function(e) {
-        ContextMenu.open(e, {
-          list: binding.value || []
-        })
-      }
-    }
+	// 注册右键菜单指令
+	(function () {
+		function fn(el, binding) {
+			el.oncontextmenu = function (e) {
+				ContextMenu.open(e, {
+					list: binding.value || []
+				});
+			};
+		}
 
-    Vue.directive('contextmenu', {
-      inserted: fn,
-      update: fn
-    })
-  })()
+		Vue.directive("contextmenu", {
+			inserted: fn,
+			update: fn
+		});
+	})();
 
-  // 挂载 $crud
-  Vue.prototype.$crud = {
-    emit: store.__inst.$emit,
-    openForm: Form.open,
-    openContextMenu: ContextMenu.open
-  }
+	// 挂载 $crud
+	Vue.prototype.$crud = {
+		emit: store.__inst.$emit,
+		openForm: Form.open,
+		openContextMenu: ContextMenu.open
+	};
 
-  return {}
-}
+	return {};
+};
 
 export const CRUD = {
-  install,
-  Form,
-  ContextMenu
-}
+	install,
+	Form,
+	ContextMenu
+};
 
-export { Form, ContextMenu }
+export { Form, ContextMenu };
 
 export default {
-  version: '1.8.1',
-  install
-}
+	version: "1.8.1",
+	install
+};

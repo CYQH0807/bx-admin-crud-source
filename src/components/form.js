@@ -62,6 +62,7 @@ export default {
 				lowCode: false, // 低代码模式
 				isEdit: true,
 				span: 24,
+
 				on: {
 					open: null,
 					submit: null,
@@ -71,6 +72,7 @@ export default {
 					hidden: false,
 					collapse: true,
 					collapseFlag: true,
+					collapseMaxSpan: 48,
 					saveButtonText: "保存",
 					closeButtonText: "取消",
 					buttons: ["save", "close"],
@@ -107,7 +109,7 @@ export default {
 			const { collapse } = this.conf.op;
 			let maxHeight = "9999px";
 			if (collapse) {
-				maxHeight = this.collapseFlag ? "50px" : "9999px";
+				maxHeight = this.collapseFlag ? "100px" : "9999px";
 			}
 			return { maxHeight };
 		}
@@ -133,6 +135,7 @@ export default {
 					case "title":
 					case "width":
 					case "span":
+					case "lowCode":
 					case "isEdit":
 						this.conf[i] = options[i];
 						break;
@@ -176,16 +179,21 @@ export default {
 					});
 				});
 			}
+
 			//  初始化设置展开的属性
-			const { collapseFlag } = this.conf.op;
-			this.collapseFlag = collapseFlag;
-			// 如果表单数据的span属性加起来小于24,就默认隐藏折叠按钮,小于24的含义是说明表单内容在同一行.不需要折叠
-			let spanCount = this.conf.items.reduce(
-				(acc, curr) => acc + (curr.span || this.conf.span),
-				0
-			);
-			if (spanCount <= 24) {
-				this.conf.op.collapse = false;
+			const { collapseFlag, collapse, collapseMaxSpan } = this.conf.op;
+			if (collapse) {
+				this.collapseFlag = collapseFlag;
+				// 如果表单数据的span属性加起来小于24,就默认隐藏折叠按钮,小于24的含义是说明表单内容在同一行.不需要折叠
+				let spanCount = this.conf.items.reduce(
+					(acc, curr) => acc + (curr.span || this.conf.span),
+					0
+				);
+				if (spanCount <= collapseMaxSpan) {
+					this.conf.op.collapse = false;
+				}
+			} else {
+				this.collapseFlag = true;
 			}
 			return this;
 		},
@@ -244,6 +252,41 @@ export default {
 			this.$emit("activeChange", item);
 		},
 
+		/**
+		 * @description: 判断按钮是否需要固定在底部
+		 * @return {*}
+		 * @author: 池樱千幻
+		 */
+		getButtonFix() {
+			const { items, span } = this.conf;
+			// 如果表单数据的span属性加起来小于24,就默认隐藏折叠按钮,小于24的含义是说明表单内容在同一行.不需要折叠
+			let spanCount = items.reduce((acc, curr) => acc + (curr.span || span), 0);
+			return this.collapseFlag ? false : spanCount % 24 !== 0;
+		},
+
+		/**
+		 * @description: 判断当前项是否折叠
+		 * @param {*} item
+		 * @return {*}
+		 * @author: 池樱千幻
+		 */
+		collapseShow(item, index) {
+			const { items, span, op } = this.conf;
+			if (!op.collapse) {
+				return false;
+			}
+			// 找到当前item之前的所有项,并且计算span的总和
+			let spanCount = items
+				.filter((obj, i) => i <= index)
+				.reduce((acc, curr) => acc + (curr.span || span), 0);
+			// 小于48的时候,就不需要折叠
+			if (spanCount <= op.collapseMaxSpan) {
+				return false;
+			} else {
+				return this.collapseFlag;
+			}
+		},
+
 		open(options) {
 			this.visible = true;
 			return this.create(options);
@@ -277,6 +320,36 @@ export default {
 
 		clear() {
 			this.clearValidate();
+		},
+
+		/**
+		 * @description: 根据prop获取表单的option
+		 * @param {*} prop
+		 * @return {*}
+		 * @author: 池樱千幻
+		 */
+		getOptionByProp(prop) {
+			return new Promise((resolve, reject) => {
+				let item = this.conf.items.find((e) => e.prop === prop);
+				if (item?.component?.options) {
+					if (item.component.options?.then) {
+						item.loading = true;
+						item.component.options
+							.then((res) => {
+								item.component.options = res;
+								resolve(res);
+							})
+							.finally(() => {
+								item.loading = false;
+							});
+						item.component.options = [];
+					} else {
+						resolve(item.component.options);
+					}
+				} else {
+					resolve([]);
+				}
+			});
 		},
 
 		submit(callback) {
@@ -435,7 +508,7 @@ export default {
 							//     })
 							//   }
 							// }
-							
+
 							// 如果有customCheck属性,就覆盖validator属性,并抛出当前对象.
 							if (e.rules?.customCheck && e.hidden !== true) {
 								const func = e.rules?.customCheck;
@@ -506,6 +579,7 @@ export default {
 								!e._hidden && (
 									<el-col
 										key={`form-item-${e.prop}`}
+										v-show={!this.collapseShow(e, i)}
 										class={[
 											{
 												active: e.active
@@ -627,118 +701,130 @@ export default {
 		},
 
 		// 渲染操作按钮
-		renderOp() {
+		renderOp(collapseDom) {
 			const { style } = __crud;
 			const { hidden, buttons, saveButtonText, closeButtonText, buttonsLocation } =
 				this.conf.op;
 
-			return hidden
-				? null
-				: buttons.map((vnode) => {
-						if (vnode === "save") {
-							return (
-								<div>
-									<el-button
-										{...{
-											props: {
-												size: "small",
-												type: "primary",
-												disabled: this.loading,
-												loading: this.saving,
-												...style.saveBtn
-											},
-											on: {
-												click: () => {
-													this.submit();
-												}
+			if (hidden) {
+				return collapseDom;
+			} else {
+				let btnDom = buttons.map((vnode) => {
+					if (vnode === "save") {
+						return (
+							<div>
+								<el-button
+									{...{
+										props: {
+											size: "small",
+											type: "primary",
+											disabled: this.loading,
+											loading: this.saving,
+											...style.saveBtn
+										},
+										on: {
+											click: () => {
+												this.submit();
 											}
-										}}>
-										{saveButtonText}
-									</el-button>
-								</div>
-							);
-						} else if (vnode === "close") {
-							const closeClass =
-								buttonsLocation === "right" ? "u-m-t-10" : "u-m-l-10";
-
-							return (
-								<div class={closeClass}>
-									<el-button
-										class="width100"
-										{...{
-											props: {
-												size: "small",
-												...style.closeBtn
-											},
-											on: {
-												click: () => {
-													this.beforeClose();
-												}
+										}
+									}}>
+									{saveButtonText}
+								</el-button>
+							</div>
+						);
+					} else if (vnode === "close") {
+						const closeClass = buttonsLocation === "right" ? "u-m-t-10" : "u-m-l-10";
+						return (
+							<div class={closeClass}>
+								<el-button
+									class="width100"
+									{...{
+										props: {
+											size: "small",
+											...style.closeBtn
+										},
+										on: {
+											click: () => {
+												this.beforeClose();
 											}
-										}}>
-										{closeButtonText}
-									</el-button>
-								</div>
-							);
-						} else if (vnode === "select") {
-							return (
-								<div>
-									<el-button
-										{...{
-											props: {
-												size: "small",
-												type: "primary",
-												plain: true,
-												disabled: this.loading,
-												loading: this.saving,
-												icon: "el-icon-search",
-												...style.saveBtn
-											},
-											on: {
-												click: () => {
-													this.submit();
-												}
+										}
+									}}>
+									{closeButtonText}
+								</el-button>
+							</div>
+						);
+					} else if (vnode === "select") {
+						return (
+							<div>
+								<el-button
+									{...{
+										props: {
+											size: "small",
+											type: "primary",
+											plain: true,
+											disabled: this.loading,
+											loading: this.saving,
+											icon: "el-icon-search",
+											...style.saveBtn
+										},
+										on: {
+											click: () => {
+												this.submit();
 											}
-										}}>
-										查询
-									</el-button>
-								</div>
-							);
-						} else {
-							return renderNode(vnode, {
-								scope: this.form,
-								$scopedSlots: this.$scopedSlots,
-								$slots: this.$slots
-							});
-						}
-				  });
+										}
+									}}>
+									查询
+								</el-button>
+							</div>
+						);
+					} else {
+						return renderNode(vnode, {
+							scope: this.form,
+							$scopedSlots: this.$scopedSlots,
+							$slots: this.$slots
+						});
+					}
+				});
+				return (
+					<div class=" u-flex u-row-right u-m-r-10">
+						{collapseDom} {btnDom}
+					</div>
+				);
+			}
 		}
 	},
 
 	render() {
 		const { buttonsLocation, collapse } = this.conf.op;
 		let Form;
+		let collapseDom = collapse ? (
+			<div
+				class="cl-collapse"
+				on-click={() => {
+					this.collapseFlag = !this.collapseFlag;
+				}}>
+				{this.collapseFlag ? "展开" : "收起"}{" "}
+				<i
+					class={
+						this.collapseFlag ? "el-icon-arrow-down " : "el-icon-arrow-down active"
+					}></i>{" "}
+			</div>
+		) : (
+			""
+		);
 		if (buttonsLocation === "right") {
-			let collapseDom = collapse ? (
-				<div
-					class="cl-collapse"
-					on-click={() => {
-						this.collapseFlag = !this.collapseFlag;
-					}}>
-					{this.collapseFlag ? "折叠" : "展开"}{" "}
-					<i
-						class={
-							this.collapseFlag ? "el-icon-arrow-down active" : "el-icon-arrow-down"
-						}></i>{" "}
-				</div>
-			) : (
-				""
-			);
 			Form = (
-				<div class="cl-form u-flex u-col-top" style={this.getFormMaxHeight}>
+				<div class="cl-form">
 					<div class="cl-form__container u-flex-1">{this.renderForm()}</div>
-					<div class="u-flex-col  u-m-l-20">{this.renderOp()}</div>
-					{collapseDom}
+					<div
+						class={[
+							{
+								"cl-form-btn-core": this.getButtonFix(),
+								"cl-form-btn": this.getButtonFix()
+							}
+						]}>
+						{this.renderOp(collapseDom)}
+					</div>
 				</div>
 			);
 		}
@@ -746,7 +832,7 @@ export default {
 			Form = (
 				<div class="cl-form">
 					<div class="cl-form__container">{this.renderForm()}</div>
-					<div class="cl-form__footer">{this.renderOp()}</div>
+					<div class="cl-form__footer">{this.renderOp(collapseDom)}</div>
 				</div>
 			);
 		}

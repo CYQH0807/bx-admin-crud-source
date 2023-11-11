@@ -23,6 +23,7 @@
 		closeButtonText: '重置', // 关闭按钮默认文字
 		collapse: this.showCollapse, // 是否显示折叠
 		collapseFlag: true,  // 折叠状态,true为折叠,false为展开
+		collapseMaxSpan: 48, // 折叠数量判断, 当前总span大于这个数量, 才开始折叠
 		saveButtonText: '查询', // 保存按钮默认文字
 		buttons: ['select'], // 按钮列表,只有两种,select 与 close
 		buttonsLocation: this.buttonsLocation // 按钮位置 两种底部 bottom 右边 right
