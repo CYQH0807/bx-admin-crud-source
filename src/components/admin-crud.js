@@ -82,7 +82,7 @@ export default {
 			type: Boolean,
 			default: true
 		},
-		lowCode:{
+		lowCode: {
 			type: Boolean,
 			default: false
 		},
@@ -154,7 +154,6 @@ export default {
 	watch: {
 		options: {
 			handler(val) {
-				console.log('val: ', val);
 				this.$Form.create(this._formOptions);
 				this.setData(this.value);
 			},
@@ -179,14 +178,12 @@ export default {
 			this.$Form.close();
 		},
 
-
-
-  /**
-   * @description:  根据prop获取表单的option
-   * @param {*} prop
-   * @return {*}
-   * @author: 池樱千幻
-   */
+		/**
+		 * @description:  根据prop获取表单的option
+		 * @param {*} prop
+		 * @return {*}
+		 * @author: 池樱千幻
+		 */
 		getOptionByProp(prop) {
 			return this.$Form.getOptionByProp(prop);
 		},
@@ -203,8 +200,8 @@ export default {
 
 		/**
 		 * @description: 根据prop获取表单的内容,如果没有就获取整个表单
-		 * @param {*} prop
-		 * @return {*}
+		 * @param {string} prop
+		 * @return {any} 如果传入了prop参数,就返回单个表单项的值,否则返回整个表单的值
 		 * @author: 池樱千幻
 		 */
 		getData(prop) {
