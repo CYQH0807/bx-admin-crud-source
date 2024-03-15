@@ -733,9 +733,8 @@ export default {
 							</div>
 						);
 					} else if (vnode === "close") {
-						const closeClass = buttonsLocation === "right" ? "u-m-t-10" : "u-m-l-10";
 						return (
-							<div class={closeClass}>
+							<div class='u-m-l-10'>
 								<el-button
 									class="width100"
 									{...{
