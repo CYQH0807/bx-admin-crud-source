@@ -245,6 +245,9 @@
 	overflow: hidden;
 	transition: all 0.3s;
 	position: relative;
+	.el-button--small {
+		padding: 9px 18px;
+	}
 
 	.cl-form__container {
 		.active {
@@ -409,7 +412,9 @@
 		position: absolute;
 		bottom: -1px;
 		left: 0;
-		transition: transform 0.3s ease-in-out, width 0.2s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
+		transition:
+			transform 0.3s ease-in-out,
+			width 0.2s 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
 	}
 }
 
@@ -593,7 +598,6 @@
 .cl-form-btn {
 	height: 50px;
 	display: flex;
-	width: 100%;
 	justify-content: end;
 	align-items: start;
 }

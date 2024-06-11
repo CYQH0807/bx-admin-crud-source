@@ -258,10 +258,13 @@ export default {
 		 * @author: 池樱千幻
 		 */
 		getButtonFix() {
-			const { items, span } = this.conf;
+			const { items, span, op } = this.conf;
 			// 如果表单数据的span属性加起来小于24,就默认隐藏折叠按钮,小于24的含义是说明表单内容在同一行.不需要折叠
 			let spanCount = items.reduce((acc, curr) => acc + (curr.span || span), 0);
-			return this.collapseFlag ? false : spanCount % 24 !== 0;
+			if (spanCount <= op.collapseMaxSpan) {
+				return spanCount % 24 > 4
+			}
+			return this.collapseFlag ? false : spanCount % 24 > 4;
 		},
 
 		/**
@@ -672,8 +675,8 @@ export default {
 																								.form,
 																							this
 																								.form[
-																								e
-																									.prop
+																							e
+																								.prop
 																							]
 																						);
 																					this.change(e);
@@ -740,6 +743,7 @@ export default {
 									{...{
 										props: {
 											size: "small",
+											icon: "el-icon-refresh",
 											...style.closeBtn
 										},
 										on: {
@@ -760,7 +764,6 @@ export default {
 										props: {
 											size: "small",
 											type: "primary",
-											plain: true,
 											disabled: this.loading,
 											loading: this.saving,
 											icon: "el-icon-search",
@@ -819,7 +822,7 @@ export default {
 						class={[
 							{
 								"cl-form-btn-core": this.getButtonFix(),
-								"cl-form-btn": this.getButtonFix()
+								"cl-form-btn": true
 							}
 						]}>
 						{this.renderOp(collapseDom)}
